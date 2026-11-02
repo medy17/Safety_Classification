@@ -1,0 +1,443 @@
+{
+  "description": "Silk v1 rules. Maps Decisions answers to an S-level without calling the API, so thresholds and rules can be changed and re-scored from cached answers. An item's level is the highest level whose rule fires.",
+  "threshold": 0.5,
+  "heuristics": [
+    {
+      "use": "refusal-runs",
+      "enabled": true,
+      "kinds": [
+        "visual"
+      ],
+      "options": {
+        "as": 0.75,
+        "reach": 1,
+        "include": [
+          "act_*",
+          "fluid_*",
+          "exposed_*",
+          "covered_nudity"
+        ]
+      }
+    },
+    {
+      "use": "confirmed-peak",
+      "enabled": true,
+      "kinds": [
+        "visual",
+        "verbal"
+      ],
+      "options": {
+        "minRun": 2
+      }
+    },
+    {
+      "use": "refusal-constant",
+      "enabled": false,
+      "kinds": [
+        "visual"
+      ],
+      "options": {
+        "as": 0.75,
+        "include": [
+          "act_*",
+          "fluid_*",
+          "exposed_*",
+          "covered_nudity"
+        ]
+      }
+    }
+  ],
+  "conditions": {
+    "{\"q\": \"id\"}": "noul probability >= threshold",
+    "{\"q\": \"id\", \"is\": \"option\"}": "choice probability of option >= threshold",
+    "{\"q\": \"id\", \"atLeast\": k}": "score probability of level k or higher >= threshold",
+    "{\"q\": [\"a\", \"b\"]} or {\"q\": \"act_*\"}": "true when any listed or matching question passes",
+    "{\"any\": [...]}, {\"all\": [...]}, {\"not\": {...}}": "combinators",
+    "\"min\": 0.7": "per-condition threshold override"
+  },
+  "levels": [
+    {
+      "level": 0,
+      "label": "S0 Safe",
+      "summary": "No people, or people clothed and neutral. No romantic or sexual content."
+    },
+    {
+      "level": 1,
+      "label": "S1 Romantic",
+      "summary": "Clothed; affectionate, romantic or flirtatious."
+    },
+    {
+      "level": 2,
+      "label": "S2 Suggestive",
+      "summary": "Revealing clothing, sexualized body focus, innuendo or teasing."
+    },
+    {
+      "level": 3,
+      "label": "S3 Mature",
+      "summary": "Underwear or swimwear, sexualized posing, groping, overt but non-explicit sexual intent."
+    },
+    {
+      "level": 4,
+      "label": "S4 Explicit",
+      "summary": "Covered or partial nudity, sex acts simulated, mimed or narrated with euphemism."
+    },
+    {
+      "level": 5,
+      "label": "S5 Graphic",
+      "summary": "Visible nudity, sex acts while undressed, or graphic sexual description."
+    }
+  ],
+  "visual": {
+    "gate": {
+      "level": 0,
+      "id": "no_people",
+      "when": {
+        "q": "people",
+        "is": "none",
+        "min": 0.6
+      }
+    },
+    "rules": [
+      {
+        "level": 5,
+        "id": "visible_nudity",
+        "when": {
+          "any": [
+            {
+              "q": [
+                "exposed_breasts",
+                "exposed_genitals"
+              ],
+              "min": 0.7
+            },
+            {
+              "q": "clothing",
+              "atLeast": 4
+            }
+          ]
+        }
+      },
+      {
+        "level": 5,
+        "id": "act_while_undressed",
+        "when": {
+          "all": [
+            {
+              "q": [
+                "act_fellatio",
+                "act_cunnilingus",
+                "act_manual",
+                "act_masturbation",
+                "act_intercrural",
+                "act_intercourse"
+              ]
+            },
+            {
+              "any": [
+                {
+                  "q": "clothing",
+                  "atLeast": 3
+                },
+                {
+                  "q": "covered_nudity"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "level": 5,
+        "id": "fluid_while_undressed",
+        "when": {
+          "all": [
+            {
+              "q": [
+                "fluid_semen",
+                "fluid_genital",
+                "fluid_lactation"
+              ]
+            },
+            {
+              "any": [
+                {
+                  "q": "clothing",
+                  "atLeast": 3
+                },
+                {
+                  "q": "covered_nudity"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "level": 4,
+        "id": "covered_or_partial_nudity",
+        "when": {
+          "any": [
+            {
+              "q": "covered_nudity"
+            },
+            {
+              "q": "clothing",
+              "atLeast": 3
+            }
+          ]
+        }
+      },
+      {
+        "level": 4,
+        "id": "simulated_act",
+        "when": {
+          "q": [
+            "act_fellatio",
+            "act_cunnilingus",
+            "act_manual",
+            "act_masturbation",
+            "act_intercrural",
+            "act_intercourse"
+          ]
+        }
+      },
+      {
+        "level": 4,
+        "id": "sexual_fluid",
+        "when": {
+          "q": [
+            "fluid_semen",
+            "fluid_genital",
+            "fluid_lactation"
+          ]
+        }
+      },
+      {
+        "level": 4,
+        "id": "implied_sex_pose",
+        "when": {
+          "q": "pose",
+          "atLeast": 3
+        }
+      },
+      {
+        "level": 3,
+        "id": "underwear_or_swimwear",
+        "when": {
+          "q": "clothing",
+          "atLeast": 2
+        }
+      },
+      {
+        "level": 3,
+        "id": "sexualized_pose",
+        "when": {
+          "q": "pose",
+          "atLeast": 2
+        }
+      },
+      {
+        "level": 3,
+        "id": "groping",
+        "when": {
+          "q": "act_groping"
+        }
+      },
+      {
+        "level": 3,
+        "id": "sexualized_fluid",
+        "when": {
+          "q": [
+            "fluid_saliva",
+            "fluid_lubricant"
+          ]
+        }
+      },
+      {
+        "level": 2,
+        "id": "revealing_clothing",
+        "when": {
+          "q": "clothing",
+          "atLeast": 1
+        }
+      },
+      {
+        "level": 2,
+        "id": "body_focus",
+        "when": {
+          "q": "focus_*"
+        }
+      },
+      {
+        "level": 1,
+        "id": "flirtatious",
+        "when": {
+          "q": "pose",
+          "atLeast": 1
+        }
+      }
+    ],
+    "flags": {
+      "minor_appearance": {
+        "when": {
+          "q": "minor_appearance"
+        }
+      },
+      "minor_sexualized": {
+        "when": {
+          "q": "minor_appearance"
+        },
+        "minLevel": 2
+      },
+      "drawn_or_rendered": {
+        "when": {
+          "any": [
+            {
+              "q": "people",
+              "is": "drawn"
+            },
+            {
+              "q": "people",
+              "is": "rendered"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "verbal": {
+    "rules": [
+      {
+        "level": 5,
+        "id": "graphic_description",
+        "when": {
+          "q": "sexual_content",
+          "atLeast": 5
+        }
+      },
+      {
+        "level": 5,
+        "id": "explicit_act",
+        "when": {
+          "all": [
+            {
+              "q": "explicit_language"
+            },
+            {
+              "q": [
+                "act_fellatio",
+                "act_cunnilingus",
+                "act_manual",
+                "act_masturbation",
+                "act_intercrural",
+                "act_intercourse",
+                "fluid_semen",
+                "fluid_genital"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "level": 4,
+        "id": "sexual_activity",
+        "when": {
+          "q": "sexual_content",
+          "atLeast": 4
+        }
+      },
+      {
+        "level": 4,
+        "id": "act_described",
+        "when": {
+          "q": [
+            "act_fellatio",
+            "act_cunnilingus",
+            "act_manual",
+            "act_masturbation",
+            "act_intercrural",
+            "act_intercourse"
+          ]
+        }
+      },
+      {
+        "level": 4,
+        "id": "sexual_fluid_described",
+        "when": {
+          "q": [
+            "fluid_semen",
+            "fluid_genital",
+            "fluid_lactation"
+          ]
+        }
+      },
+      {
+        "level": 3,
+        "id": "overtly_sexual",
+        "when": {
+          "q": "sexual_content",
+          "atLeast": 3
+        }
+      },
+      {
+        "level": 3,
+        "id": "groping_described",
+        "when": {
+          "q": "act_groping"
+        }
+      },
+      {
+        "level": 3,
+        "id": "sexualized_fluid_described",
+        "when": {
+          "q": [
+            "fluid_saliva",
+            "fluid_lubricant"
+          ]
+        }
+      },
+      {
+        "level": 2,
+        "id": "suggestive",
+        "when": {
+          "q": "sexual_content",
+          "atLeast": 2
+        }
+      },
+      {
+        "level": 1,
+        "id": "romantic",
+        "when": {
+          "q": "sexual_content",
+          "atLeast": 1
+        }
+      }
+    ],
+    "flags": {
+      "non_consent": {
+        "when": {
+          "q": "non_consent"
+        },
+        "minLevel": 2
+      },
+      "minor_coded": {
+        "when": {
+          "q": "minor_coded"
+        },
+        "minLevel": 1
+      },
+      "family_roleplay": {
+        "when": {
+          "q": "family_roleplay"
+        },
+        "minLevel": 1
+      }
+    }
+  },
+  "video": {
+    "ratingFrom": "peak",
+    "sustainedShare": 0.1,
+    "note": "peak = highest level of any frame or window. sustained = highest level held by at least sustainedShare of the timed runtime, which ignores one-off misfires. The video rating is the higher of the visual and verbal peaks; sustained is reported beside it."
+  },
+  "heuristicsNote": "Optional modules in src/heuristics/. \"items\" modules rewrite the frame/window sequence before evaluation; \"summary\" modules add metrics (confirmed-peak adds confirmedPeak). minor_appearance is deliberately not in any refusal \"include\" list: refusals there should go to human review, not be scored."
+}

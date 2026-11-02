@@ -1,0 +1,170 @@
+{
+  "description": "Silk v1 image questions. Ask them all in one Decisions request per image. Every answer is a factual observation; the S-level is computed afterwards by rules.json.",
+  "preamble": "A single image. Describe only what is visible in it.",
+  "questions": {
+    "people": {
+      "type": "choice",
+      "instructions": "What kind of human or human-like figure is the main subject of the image?",
+      "criteria": {
+        "none": "No people or human-like figures are visible.",
+        "real": "A real, photographed person.",
+        "drawn": "A drawn, painted or animated human or humanoid character, such as anime, cartoon or illustration.",
+        "rendered": "A 3D render, game character, doll, figure, mannequin or AI-generated figure that resembles a person."
+      }
+    },
+    "clothing": {
+      "type": "score",
+      "instructions": "How much is the most-undressed visible person wearing? If nobody is visible, choose the first level.",
+      "criteria": [
+        "Fully clothed in everyday or modest clothing, or nobody is visible.",
+        "Clothed but revealing: low neckline or visible cleavage, crop top, very short skirt or shorts, tight, sheer-looking or costume outfit.",
+        "Underwear, lingerie, swimwear, only a towel, or a robe or shirt worn open.",
+        "Partially nude: topless, bottomless, or nude apart from minimal covering such as pasties, tape or a hand.",
+        "Fully nude."
+      ]
+    },
+    "covered_nudity": {
+      "type": "noul",
+      "instructions": "The person is nude or topless underneath, with no clothing, bra, bikini or lingerie over the area, and the nipples, genitals or buttocks are hidden only by pasties, patches, tape, cups or shells held or stuck on, hands, arms, censor bars, blur, bedsheets, steam, water or camera framing.",
+      "criteria": {
+        "true": "Bare skin with only the private areas hidden by objects, hands or framing, such as bare breasts behind cups, shells, patches or hands.",
+        "false": "Clothing, a bra, bikini, lingerie or a costume covers the area, however revealing. Cleavage, low necklines, harnesses or straps over underwear, and hair falling over clothing do not count. Or the nudity is uncovered, or nobody is visible."
+      }
+    },
+    "exposed_breasts": {
+      "type": "noul",
+      "instructions": "Bare nipples or areolae are visible.",
+      "criteria": {
+        "true": "At least one bare nipple or areola is visible, including through fully transparent clothing.",
+        "false": "No bare nipple or areola is visible."
+      }
+    },
+    "exposed_genitals": {
+      "type": "noul",
+      "instructions": "Bare genitals or the anus are visible.",
+      "criteria": {
+        "true": "Bare genitals or the anus are visible, including through fully transparent clothing.",
+        "false": "No bare genitals or anus are visible."
+      }
+    },
+    "pose": {
+      "type": "score",
+      "instructions": "How sexual is the pose, gesture or expression of the people shown? If nobody is visible, choose the first level.",
+      "criteria": [
+        "Neutral or everyday: sitting, standing, talking, working, sleeping; or nobody is visible.",
+        "Affectionate or flirtatious: smiling or winking at the camera, leaning in, blowing a kiss, cuddling, holding hands.",
+        "Sexualized posing: arching the back, spreading the legs, pushing out the chest or hips, lying seductively, suggestive use of the mouth, tongue or fingers.",
+        "Implies sexual activity: positioned as if straddling, riding, mounting or being mounted, kneeling at crotch height, or bent over in a sexual way."
+      ]
+    },
+    "act_fellatio": {
+      "type": "noul",
+      "instructions": "Someone performs, simulates or mimes oral sex on a penis or on a phallic object such as a finger, popsicle, banana, tentacle or sex toy. Miming toward the camera or with a prop counts. Licking, kissing or mouthing a microphone, including ear-shaped binaural microphones used for ASMR ear licking, does not count.",
+      "criteria": { "true": "Fellatio is performed, simulated or mimed on a penis or phallic object.", "false": "No fellatio is performed, simulated or mimed, or only a microphone or ear-shaped microphone is being licked." }
+    },
+    "act_cunnilingus": {
+      "type": "noul",
+      "instructions": "Someone performs, simulates or mimes oral sex on a vulva. Miming toward the camera or with a prop counts. Licking, kissing or mouthing a microphone, including ear-shaped binaural microphones used for ASMR ear licking, does not count.",
+      "criteria": { "true": "Cunnilingus is performed, simulated or mimed.", "false": "No cunnilingus is performed, simulated or mimed, or only a microphone or ear-shaped microphone is being licked." }
+    },
+    "act_manual": {
+      "type": "noul",
+      "instructions": "Someone strokes, rubs or fondles another person's genital area, or a prop standing in for one, in a sexual way. Handjob gestures toward the camera count.",
+      "criteria": { "true": "Manual sexual stimulation is performed, simulated or mimed.", "false": "No manual sexual stimulation is shown." }
+    },
+    "act_masturbation": {
+      "type": "noul",
+      "instructions": "Someone touches, rubs or stimulates their own genitals or breasts in a sexual way, over or under clothing.",
+      "criteria": { "true": "Self-stimulation is performed, simulated or mimed.", "false": "No self-stimulation is shown." }
+    },
+    "act_groping": {
+      "type": "noul",
+      "instructions": "Someone gropes, squeezes or fondles breasts or buttocks in a sexual way, their own or another person's.",
+      "criteria": { "true": "Sexual groping is shown.", "false": "No sexual groping is shown." }
+    },
+    "act_intercrural": {
+      "type": "noul",
+      "instructions": "Someone performs, simulates or mimes intercrural sex: thrusting between, or being thrust between, closed thighs.",
+      "criteria": { "true": "Intercrural sex is performed, simulated or mimed.", "false": "No intercrural sex is shown." }
+    },
+    "act_intercourse": {
+      "type": "noul",
+      "instructions": "Someone performs, simulates or mimes vaginal or anal intercourse, including riding, straddling or thrusting motions toward the camera or a partner.",
+      "criteria": { "true": "Intercourse is performed, simulated or mimed.", "false": "No intercourse is shown." }
+    },
+    "fluid_semen": {
+      "type": "noul",
+      "instructions": "White, cloudy or translucent fluid resembling semen is shown on a face, mouth, tongue, body, clothing or object in a sexual way, including stand-ins such as lotion, milk, yogurt, cream or condensed milk.",
+      "criteria": { "true": "Semen or a semen-like stand-in is shown in a sexual way.", "false": "No semen-like fluid, or the fluid is plainly ordinary food or drink in a non-sexual context." }
+    },
+    "fluid_saliva": {
+      "type": "noul",
+      "instructions": "Saliva is shown in a sexual way: strands or drool from the mouth or tongue, spitting, or drooling onto a body, finger, prop or the camera.",
+      "criteria": { "true": "Saliva or drool is shown in a sexual way.", "false": "No sexualized saliva or drool." }
+    },
+    "fluid_lubricant": {
+      "type": "noul",
+      "instructions": "Oil, lotion, gel or lubricant is applied, dripped or spread on skin or an object in a sexualized way, such as on the chest, buttocks, thighs or a phallic prop.",
+      "criteria": { "true": "Lubricant or oil is used in a sexualized way.", "false": "No lubricant, or it is used in a plainly non-sexual way such as a hand massage." }
+    },
+    "fluid_lactation": {
+      "type": "noul",
+      "instructions": "Breast milk or lactation is shown or simulated, such as milk on or spraying from the breasts.",
+      "criteria": { "true": "Lactation is shown or simulated.", "false": "No lactation is shown." }
+    },
+    "fluid_genital": {
+      "type": "noul",
+      "instructions": "Wetness or fluid is shown coming from or around the genitals, such as arousal fluid or squirting, including through clothing.",
+      "criteria": { "true": "Genital fluid or wetness is shown.", "false": "No genital fluid or wetness is shown." }
+    },
+    "focus_chest": {
+      "type": "noul",
+      "instructions": "The framing, pose, clothing or camera angle draws sexual attention to the chest or breasts.",
+      "criteria": { "true": "The chest is a sexualized focal point.", "false": "The chest is not emphasized in a sexual way." }
+    },
+    "focus_buttocks": {
+      "type": "noul",
+      "instructions": "The framing, pose, clothing or camera angle draws sexual attention to the buttocks.",
+      "criteria": { "true": "The buttocks are a sexualized focal point.", "false": "The buttocks are not emphasized in a sexual way." }
+    },
+    "focus_crotch": {
+      "type": "noul",
+      "instructions": "The framing, pose, clothing or camera angle draws sexual attention to the crotch or groin.",
+      "criteria": { "true": "The crotch is a sexualized focal point.", "false": "The crotch is not emphasized in a sexual way." }
+    },
+    "focus_legs": {
+      "type": "noul",
+      "instructions": "The framing, pose, clothing or camera angle draws sexual attention to the thighs or legs, including stockings, garters or thigh-highs.",
+      "criteria": { "true": "The thighs or legs are a sexualized focal point.", "false": "The thighs or legs are not emphasized in a sexual way." }
+    },
+    "focus_feet": {
+      "type": "noul",
+      "instructions": "The framing, pose or camera angle draws sexual attention to the feet.",
+      "criteria": { "true": "The feet are a sexualized focal point.", "false": "The feet are not emphasized in a sexual way." }
+    },
+    "focus_mouth": {
+      "type": "noul",
+      "instructions": "The framing or gestures draw sexual attention to the mouth, lips or tongue, such as licking, an open mouth toward the camera, sucking a finger or drool.",
+      "criteria": { "true": "The mouth is a sexualized focal point.", "false": "The mouth is not emphasized in a sexual way." }
+    },
+    "minor_appearance": {
+      "type": "noul",
+      "instructions": "Any person or character appears to be under 18: childlike face or body proportions, child-associated clothing or props, a school uniform worn by someone who looks school-age, or a drawn character styled as a child.",
+      "criteria": {
+        "true": "At least one person or character appears to be under 18.",
+        "false": "Everyone visible appears to be an adult, or nobody is visible."
+      }
+    },
+    "setting": {
+      "type": "choice",
+      "instructions": "Where does the image appear to take place?",
+      "criteria": {
+        "bedroom": "A bedroom or a bed.",
+        "bathroom": "A bathroom, bath, shower, hot spring or pool.",
+        "indoor_other": "Another indoor space: living room, office, shop, classroom, studio, car.",
+        "outdoor": "Outdoors.",
+        "unclear": "Plain backdrop, extreme close-up or not identifiable."
+      }
+    }
+  }
+}

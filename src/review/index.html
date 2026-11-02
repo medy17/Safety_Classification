@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Silk Review</title>
+<style>
+:root {
+  --bg: #f6f6f4; --panel: #ffffff; --panel-2: #f0efec; --line: #e2e0db; --text: #1d1d1b; --muted: #6b6a66; --accent: #6d4aff;
+  --l0: #8b8f97; --l1: #4c84e8; --l2: #1fa595; --l3: #d9a514; --l4: #e8711c; --l5: #dc3d3d;
+  --good: #1f9d55; --bad: #d64545; --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121214; --panel: #1b1b1f; --panel-2: #232328; --line: #2f2f36; --text: #ececf0; --muted: #9a9aa5; --accent: #9b85ff;
+    --l0: #7c818b; --l1: #5b93f5; --l2: #2bbfad; --l3: #e8b928; --l4: #f2843a; --l5: #ef5555;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121214; --panel: #1b1b1f; --panel-2: #232328; --line: #2f2f36; --text: #ececf0; --muted: #9a9aa5; --accent: #9b85ff;
+  --l0: #7c818b; --l1: #5b93f5; --l2: #2bbfad; --l3: #e8b928; --l4: #f2843a; --l5: #ef5555;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+button { font: inherit; color: inherit; }
+.app { display: grid; grid-template-columns: 300px 1fr; height: 100vh; }
+aside { border-right: 1px solid var(--line); background: var(--panel); overflow-y: auto; }
+aside header { padding: 14px 16px 10px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--panel); z-index: 2; }
+aside h1 { font-size: 15px; margin: 0 0 2px; }
+.sub { color: var(--muted); font-size: 12px; }
+.tabs { display: flex; gap: 4px; margin-top: 10px; }
+.tab { flex: 1; border: 1px solid var(--line); background: var(--panel-2); border-radius: 7px; padding: 5px 0; cursor: pointer; font-size: 12px; }
+.tab.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+.vid { padding: 10px 16px; border-bottom: 1px solid var(--line); cursor: pointer; }
+.vid:hover { background: var(--panel-2); }
+.vid.on { background: var(--panel-2); box-shadow: inset 3px 0 0 var(--accent); }
+.vid .name { font-weight: 600; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vid .meta { display: flex; gap: 6px; align-items: center; margin-top: 5px; flex-wrap: wrap; }
+.strip { display: flex; height: 6px; border-radius: 3px; overflow: hidden; margin-top: 7px; background: var(--panel-2); }
+.strip span { flex: 1; }
+main { overflow-y: auto; }
+.wrap { padding: 18px 22px 60px; max-width: 1500px; }
+.chip { display: inline-flex; align-items: center; gap: 4px; border-radius: 999px; padding: 1px 8px; font-size: 11.5px; font-weight: 600; color: #fff; white-space: nowrap; }
+.chip.lv0 { background: var(--l0); } .chip.lv1 { background: var(--l1); } .chip.lv2 { background: var(--l2); }
+.chip.lv3 { background: var(--l3); color: #1d1d1b; } .chip.lv4 { background: var(--l4); } .chip.lv5 { background: var(--l5); }
+.chip.ghost { background: transparent; color: var(--muted); border: 1px solid var(--line); font-weight: 500; }
+.chip.warn { background: transparent; color: var(--l4); border: 1px dashed var(--l4); font-weight: 500; }
+.rule { display: inline-block; border: 1px solid var(--line); border-radius: 6px; padding: 0 6px; font-size: 11.5px; margin: 2px 3px 0 0; cursor: pointer; background: var(--panel-2); }
+.rule.wrong { text-decoration: line-through; color: var(--bad); border-color: var(--bad); }
+.rule.refused { border-style: dashed; color: var(--l4); cursor: default; background: transparent; }
+.rule.adjusted { border-color: var(--accent); color: var(--accent); cursor: default; background: transparent; }
+h2 { margin: 0; font-size: 19px; }
+.titlek { color: var(--muted); margin-top: 2px; }
+.summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 16px 0; }
+.stat { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 12px; }
+.stat .k { color: var(--muted); font-size: 11.5px; text-transform: uppercase; letter-spacing: .04em; }
+.stat .v { margin-top: 4px; font-size: 15px; font-weight: 600; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 14px; }
+.panel h3 { margin: 0 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+.lanes { display: grid; grid-template-columns: 70px 1fr; gap: 6px 10px; align-items: center; }
+.lane { position: relative; height: 22px; background: var(--panel-2); border-radius: 5px; overflow: hidden; }
+.lane i { position: absolute; top: 0; bottom: 0; cursor: pointer; border-right: 1px solid var(--panel); }
+.lane i:hover { outline: 2px solid var(--text); z-index: 1; }
+.lane i.labelled::after { content: ""; position: absolute; left: 50%; bottom: 2px; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: #fff; }
+.axis { display: flex; justify-content: space-between; color: var(--muted); font-size: 11px; grid-column: 2; }
+.levelpick { display: inline-flex; gap: 3px; }
+.levelpick button { width: 30px; height: 26px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel-2); cursor: pointer; font-weight: 600; font-size: 12px; }
+.levelpick button.model { box-shadow: inset 0 -3px 0 var(--muted); }
+.levelpick button.on { color: #fff; border-color: transparent; }
+.levelpick button.on.b0 { background: var(--l0); } .levelpick button.on.b1 { background: var(--l1); } .levelpick button.on.b2 { background: var(--l2); }
+.levelpick button.on.b3 { background: var(--l3); color: #1d1d1b; } .levelpick button.on.b4 { background: var(--l4); } .levelpick button.on.b5 { background: var(--l5); }
+.toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 4px 0 12px; position: sticky; top: 0; background: var(--bg); padding: 8px 0; z-index: 3; }
+.toolbar select, .toolbar input { background: var(--panel); border: 1px solid var(--line); color: var(--text); border-radius: 7px; padding: 5px 8px; font: inherit; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; background: var(--panel); padding: 5px 10px; cursor: pointer; font-size: 12.5px; }
+.seg button.on { background: var(--accent); color: #fff; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; }
+.card.focus { outline: 2px solid var(--accent); }
+.card .img { position: relative; aspect-ratio: 16/9; background: #000; cursor: zoom-in; }
+.card .img img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.card .img .badge { position: absolute; left: 8px; top: 8px; display: flex; gap: 4px; }
+.card .img .time { position: absolute; right: 8px; top: 8px; background: rgba(0,0,0,.65); color: #fff; padding: 1px 7px; border-radius: 6px; font-size: 12px; font-variant-numeric: tabular-nums; }
+.card .body { padding: 9px 11px 11px; display: flex; flex-direction: column; gap: 7px; }
+.signals { display: grid; grid-template-columns: 1fr 44px; gap: 2px 8px; font-size: 12px; }
+.signals .bar { height: 4px; border-radius: 2px; background: var(--panel-2); margin-top: 2px; }
+.signals .bar b { display: block; height: 100%; border-radius: 2px; background: var(--accent); }
+.signals .p { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.row .lbl { color: var(--muted); font-size: 12px; }
+.note { width: 100%; background: var(--panel-2); border: 1px solid var(--line); border-radius: 7px; color: var(--text); padding: 5px 8px; font: inherit; font-size: 12.5px; }
+.status { font-size: 11.5px; color: var(--muted); }
+.status.agree { color: var(--good); } .status.disagree { color: var(--bad); }
+.win { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 12px; margin-bottom: 10px; }
+.win pre { white-space: pre-wrap; font: 12.5px/1.5 ui-monospace, Consolas, monospace; background: var(--panel-2); border-radius: 7px; padding: 8px 10px; max-height: 260px; overflow: auto; margin: 6px 0 0; }
+details summary { cursor: pointer; color: var(--muted); font-size: 12px; }
+.lightbox { position: fixed; inset: 0; background: rgba(0,0,0,.88); display: none; z-index: 20; padding: 24px; }
+.lightbox.on { display: grid; grid-template-columns: 1fr 360px; gap: 18px; }
+.lightbox img { max-width: 100%; max-height: calc(100vh - 48px); object-fit: contain; margin: auto; }
+.lightbox .side { background: var(--panel); border-radius: var(--radius); padding: 14px; overflow-y: auto; max-height: calc(100vh - 48px); }
+.lightbox .close { position: absolute; top: 10px; right: 14px; color: #fff; background: none; border: 0; font-size: 26px; cursor: pointer; }
+table.cm { border-collapse: collapse; font-variant-numeric: tabular-nums; }
+table.cm th, table.cm td { border: 1px solid var(--line); padding: 5px 9px; text-align: center; font-size: 12.5px; }
+table.cm td.diag { background: color-mix(in srgb, var(--good) 22%, transparent); font-weight: 700; }
+table.cm td.over { background: color-mix(in srgb, var(--l4) 18%, transparent); }
+table.cm td.under { background: color-mix(in srgb, var(--l1) 18%, transparent); }
+.empty { color: var(--muted); padding: 30px 0; text-align: center; }
+.kbd { font: 11px ui-monospace, Consolas, monospace; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 4px; }
+@media (max-width: 860px) { .app { grid-template-columns: 1fr; height: auto; } aside { max-height: 40vh; } .lightbox.on { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <header>
+      <h1>Silk Review</h1>
+      <div class="sub" id="progress">Loading…</div>
+      <div class="tabs"><button class="tab on" data-tab="videos">Videos</button><button class="tab" data-tab="calibration">Calibration</button></div>
+    </header>
+    <div id="videoList"></div>
+  </aside>
+  <main><div class="wrap" id="main"><div class="empty">Loading…</div></div></main>
+</div>
+<div class="lightbox" id="lightbox"><button class="close" aria-label="Close">×</button><img alt=""><div class="side"></div></div>
+<script>
+const state = { overview: null, video: null, current: null, tab: 'videos', filter: 'all', rule: '', focus: -1 };
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const mmss = t => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
+const chip = (l, extra = '') => l === null || l === undefined ? `<span class="chip ghost">–</span>` : `<span class="chip lv${l}">S${l}${extra}</span>`;
+const frameKey = (id, t) => `${id}@${t}`;
+const colour = l => l === null || l === undefined ? 'transparent' : `var(--l${l})`;
+
+async function api(path, body) {
+  const r = await fetch(path, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : {});
+  if (!r.ok) throw new Error(`${r.status} ${await r.text()}`);
+  return r.json();
+}
+async function saveLabel(scope, key, value) {
+  const labels = state.overview.labels[scope];
+  if (value === null) delete labels[key]; else labels[key] = { ...value, updatedAt: new Date().toISOString() };
+  await api('/api/labels', { scope, key, value });
+  renderProgress();
+}
+
+function renderProgress() {
+  const o = state.overview, total = o.videos.reduce((s, v) => s + v.frames.length, 0);
+  const done = Object.values(o.labels.frames).filter(l => l.level !== undefined).length;
+  $('#progress').textContent = `${o.scale} · ${o.videos.length} videos · ${done}/${total} frames labelled · ${Object.keys(o.labels.windows).length} windows`;
+}
+function renderList() {
+  const o = state.overview;
+  $('#videoList').innerHTML = o.videos.map(v => {
+    const labelled = v.frames.filter(([t]) => o.labels.frames[frameKey(v.id, t)]?.level !== undefined).length;
+    const changed = v.before && (v.before.rating !== v.rating || v.before.sustained !== v.sustained);
+    const expected = o.labels.videos[v.id]?.level;
+    return `<div class="vid ${state.current === v.id ? 'on' : ''}" data-id="${esc(v.id)}">
+      <div class="name" title="${esc(v.name)}">${esc(v.titleEn || v.name)}</div>
+      <div class="meta">${chip(v.rating)}<span class="sub">sustained</span>${chip(v.sustained)}
+        ${changed ? `<span class="chip ghost" title="Before the wording fixes">was S${v.before.rating}/S${v.before.sustained}</span>` : ''}
+        ${expected !== undefined ? `<span class="chip ghost">you: S${expected}</span>` : ''}
+        <span class="sub">${v.minutes} min · ${labelled}/${v.frames.length}</span></div>
+      <div class="strip">${v.frames.map(([, l]) => `<span style="background:${colour(l)}"></span>`).join('')}</div>
+    </div>`;
+  }).join('');
+}
+
+function signals(answers, questions) {
+  if (!answers) return '<div class="sub">No answers (blocked)</div>';
+  const rows = [];
+  for (const [id, a] of Object.entries(answers)) {
+    const q = questions[id]; if (!q) continue;
+    if (a.type === 'noul' && a.noul >= .2) rows.push([id, a.noul, a.noul]);
+    if (a.type === 'score') { const max = q.criteria.length - 1; if (a.score >= .5) rows.push([`${id} (0–${max})`, a.score / max, a.score.toFixed(2)]); }
+    if (a.type === 'choice' && id !== 'setting') rows.push([`${id}: ${a.choice}`, a.probabilities?.[a.choice] ?? 1, (a.probabilities?.[a.choice] ?? 1)]);
+  }
+  rows.sort((x, y) => y[1] - x[1]);
+  return `<div class="signals">${rows.slice(0, 9).map(([n, w, p]) => `<div>${esc(n)}<div class="bar"><b style="width:${Math.round(Math.min(1, w) * 100)}%"></b></div></div><div class="p">${typeof p === 'number' ? p.toFixed(2) : p}</div>`).join('')}</div>`;
+}
+function levelPicker(model, chosen, attrs) {
+  return `<span class="levelpick" ${attrs}>${[0, 1, 2, 3, 4, 5].map(l => `<button data-level="${l}" class="b${l} ${l === model ? 'model' : ''} ${l === chosen ? 'on' : ''}" title="${l === model ? 'Model says S' + l : 'S' + l}">${l}</button>`).join('')}</span>`;
+}
+function verdict(model, label) {
+  if (!label || label.level === undefined) return '<span class="status">unlabelled</span>';
+  return label.level === model ? '<span class="status agree">✓ agrees</span>' : `<span class="status disagree">model S${model} · you S${label.level}</span>`;
+}
+
+function visibleFrames() {
+  const v = state.video, o = state.overview;
+  return v.frames.map((f, i) => ({ ...f, i })).filter(f => {
+    const label = o.labels.frames[frameKey(state.current, f.t)];
+    if (state.rule && !f.fired.includes(state.rule)) return false;
+    switch (state.filter) {
+      case 'ge3': return f.level >= 3;
+      case 'ge4': return f.level >= 4;
+      case 'refused': return f.refused.length > 0;
+      case 'changed': return f.before !== null && f.before !== f.level;
+      case 'unlabelled': return !label || label.level === undefined;
+      case 'disagree': return label && label.level !== undefined && label.level !== f.level;
+      case 'adjusted': return (f.adjusted || []).length > 0;
+      default: return true;
+    }
+  });
+}
+function frameCard(f) {
+  const id = state.current, key = frameKey(id, f.t), label = state.overview.labels.frames[key] || {};
+  const wrong = new Set(label.wrongRules || []);
+  const changed = f.before !== null && f.before !== f.level;
+  return `<div class="card" data-i="${f.i}" id="frame-${f.i}">
+    <div class="img" data-zoom="${f.i}"><img loading="lazy" src="/frames/${encodeURIComponent(id)}/${f.file}" alt="Frame at ${mmss(f.t)}">
+      <div class="badge">${chip(f.level)}${changed ? `<span class="chip ghost" style="background:rgba(0,0,0,.55);color:#fff">was S${f.before}</span>` : ''}${f.source === 'scene' ? '<span class="chip ghost" style="background:rgba(0,0,0,.55);color:#fff">scene</span>' : ''}</div>
+      <div class="time">${mmss(f.t)}</div></div>
+    <div class="body">
+      <div>${f.fired.length ? f.fired.map(r => `<span class="rule ${wrong.has(r) ? 'wrong' : ''}" data-rule="${esc(r)}" title="Click to mark this rule as wrong for this frame">${esc(r)}</span>`).join('') : '<span class="sub">no rules fired</span>'}
+        ${f.refused.map(q => `<span class="rule refused" title="OpenAI refused to answer this question">refused: ${esc(q)}</span>`).join('')}
+        ${(f.adjusted || []).map(a => `<span class="rule adjusted" title="Changed by the ${esc(a.heuristic)} heuristic">${esc(a.heuristic)}: ${esc(a.question)} → ${a.value}</span>`).join('')}</div>
+      ${signals(f.answers, state.video.questions.visual)}
+      <div class="row"><span class="lbl">Correct level</span>${levelPicker(f.level, label.level, `data-frame="${f.i}"`)}${verdict(f.level, label)}</div>
+      <input class="note" data-note="${f.i}" placeholder="Note (optional)" value="${esc(label.note || '')}">
+    </div></div>`;
+}
+function renderVideo() {
+  const v = state.video, o = state.overview, id = state.current, r = v.result;
+  const meta = o.videos.find(x => x.id === id), duration = r.minutes * 60;
+  const vlabel = o.labels.videos[id] || {};
+  const allRules = [...new Set(v.frames.flatMap(f => f.fired))].sort();
+  const frames = visibleFrames();
+  const lane = (items, scope) => items.map(it => {
+    const left = it.start / duration * 100, width = Math.max(.4, (it.end - it.start) / duration * 100);
+    const labelled = scope === 'frames' ? o.labels.frames[frameKey(id, it.t)]?.level !== undefined : o.labels.windows[`${id}@${it.start}`]?.level !== undefined;
+    return `<i class="${labelled ? 'labelled' : ''}" style="left:${left}%;width:${width}%;background:${colour(it.level)}" data-jump="${scope}:${it.i}" title="${scope === 'frames' ? mmss(it.t) : mmss(it.start) + '–' + mmss(it.end)} · S${it.level ?? '–'} ${(it.fired || []).join(', ')}"></i>`;
+  }).join('');
+  $('#main').innerHTML = `
+    <h2>${esc(r.titleEn)}</h2><div class="titlek">${esc(r.titleKo)} · ${esc(r.date || '')} · ${r.minutes} min · <span class="sub">${esc(id)}</span></div>
+    <div class="summary">
+      <div class="stat"><div class="k">Rating (${esc(r.ratingFrom || 'peak')})</div><div class="v">${chip(r.rating)}<span class="sub">${esc(r.driver || '')}</span></div></div>
+      <div class="stat"><div class="k">Sustained</div><div class="v">${chip(r.sustained)}</div></div>
+      <div class="stat"><div class="k">Confirmed peak</div><div class="v">${chip(r.confirmedPeak)}<span class="sub">visual ${r.visual.confirmedPeak ?? '–'} · text ${r.verbal.confirmedPeak ?? '–'}</span></div></div>
+      <div class="stat"><div class="k">Visual peak / sustained</div><div class="v">${chip(r.visual.peak)}${chip(r.visual.sustained)}<span class="sub">${Math.round(r.visual.shareAtLeast3 * 100)}% ≥S3</span></div></div>
+      <div class="stat"><div class="k">Transcript peak / sustained</div><div class="v">${chip(r.verbal.peak)}${chip(r.verbal.sustained)}<span class="sub">${r.verbal.items} windows</span></div></div>
+      <div class="stat"><div class="k">Title</div><div class="v">${chip(r.titleLevel)}</div></div>
+      <div class="stat"><div class="k">Refusals</div><div class="v">${meta.refusedFrames} frames</div></div>
+      ${meta.before ? `<div class="stat"><div class="k">Before fixes</div><div class="v">${chip(meta.before.rating)}${chip(meta.before.sustained)}</div></div>` : ''}
+    </div>
+    <div class="sub" style="margin:-6px 0 12px">Heuristics: ${(o.heuristics || []).map(x => `<span class="rule ${x.enabled ? 'adjusted' : ''}" style="cursor:default${x.enabled ? '' : ';opacity:.5;text-decoration:line-through'}" title="${esc(JSON.stringify(x.options))}">${esc(x.use)}</span>`).join('') || 'none'}</div>
+    <div class="panel"><h3>Your verdict for the whole video</h3>
+      <div class="row">${levelPicker(r.rating, vlabel.level, 'data-video="1"')}${verdict(r.rating, vlabel)}</div>
+      <input class="note" style="margin-top:8px" data-vnote="1" placeholder="What's actually in this video? (optional)" value="${esc(vlabel.note || '')}">
+    </div>
+    <div class="panel"><h3>Timeline</h3><div class="lanes">
+      <span class="sub">Frames</span><div class="lane">${lane(v.frames.map((f, i) => ({ ...f, i })), 'frames')}</div>
+      <span class="sub">Transcript</span><div class="lane">${lane(v.windows.map((w, i) => ({ ...w, i })), 'windows')}</div>
+      <div class="axis"><span>0:00</span><span>${mmss(duration / 2)}</span><span>${mmss(duration)}</span></div></div></div>
+    <div class="toolbar">
+      <div class="seg" id="filters">${[['all', 'All'], ['ge3', '≥ S3'], ['ge4', '≥ S4'], ['refused', 'Refused'], ['changed', 'Changed'], ['adjusted', 'Heuristic'], ['unlabelled', 'Unlabelled'], ['disagree', 'Disagree']].map(([k, n]) => `<button data-filter="${k}" class="${state.filter === k ? 'on' : ''}">${n}</button>`).join('')}</div>
+      <select id="ruleFilter"><option value="">Any rule</option>${allRules.map(x => `<option ${state.rule === x ? 'selected' : ''}>${esc(x)}</option>`).join('')}</select>
+      <span class="sub">${frames.length} of ${v.frames.length} frames · keys: <span class="kbd">j</span>/<span class="kbd">k</span> move, <span class="kbd">0</span>–<span class="kbd">5</span> label, <span class="kbd">a</span> accept model, <span class="kbd">Enter</span> zoom</span>
+    </div>
+    <div class="grid">${frames.length ? frames.map(frameCard).join('') : '<div class="empty">No frames match this filter.</div>'}</div>
+    <div class="panel" style="margin-top:18px"><h3>Transcript windows</h3>
+      ${v.windows.map((w, i) => { const key = `${id}@${w.start}`, label = o.labels.windows[key] || {}; return `<div class="win" id="window-${i}">
+        <div class="row">${chip(w.level)}<b>${mmss(w.start)}–${mmss(w.end)}</b>${w.fired.map(x => `<span class="rule" style="cursor:default">${esc(x)}</span>`).join('')}${w.refused.map(q => `<span class="rule refused">refused: ${esc(q)}</span>`).join('')}</div>
+        <div class="row" style="margin-top:6px"><span class="lbl">Correct level</span>${levelPicker(w.level, label.level, `data-window="${i}"`)}${verdict(w.level, label)}</div>
+        <details><summary>Signals and transcript</summary>${signals(w.answers, v.questions.verbal)}<pre>${esc(w.text)}</pre></details></div>`; }).join('') || '<div class="empty">No transcript</div>'}
+      <div class="win"><div class="row">${chip(v.title.level)}<b>Title</b> ${esc(v.title.text)} ${v.title.fired.map(x => `<span class="rule" style="cursor:default">${esc(x)}</span>`).join('')}</div></div>
+    </div>`;
+  if (state.focus >= 0) document.getElementById(`frame-${state.focus}`)?.classList.add('focus');
+}
+
+function renderCalibration() {
+  const o = state.overview, rows = [], perRule = {}, perRefusal = {};
+  for (const v of o.videos) for (const [t, level, fired, refused = []] of v.frames) {
+    const label = o.labels.frames[frameKey(v.id, t)];
+    for (const q of refused) { perRefusal[q] ??= { refused: 0, labelled: [] }; perRefusal[q].refused++; if (label?.level !== undefined) perRefusal[q].labelled.push(label.level); }
+    if (!label || label.level === undefined) continue;
+    rows.push([level, label.level]);
+    for (const r of fired) { perRule[r] ??= { fired: 0, wrong: 0 }; perRule[r].fired++; if ((label.wrongRules || []).includes(r)) perRule[r].wrong++; }
+  }
+  const vids = o.videos.filter(v => o.labels.videos[v.id]?.level !== undefined);
+  const n = rows.length, agree = rows.filter(([a, b]) => a === b).length, within1 = rows.filter(([a, b]) => Math.abs(a - b) <= 1).length;
+  const over = rows.filter(([a, b]) => a > b).length, under = rows.filter(([a, b]) => a < b).length;
+  const cell = (m, y) => rows.filter(([a, b]) => a === m && b === y).length;
+  $('#main').innerHTML = `<h2>Calibration</h2><div class="titlek">How the model's frame levels compare with your labels. Threshold ${o.threshold}.</div>
+    <div class="summary">
+      <div class="stat"><div class="k">Labelled frames</div><div class="v">${n}</div></div>
+      <div class="stat"><div class="k">Exact agreement</div><div class="v">${n ? Math.round(agree / n * 100) : 0}%</div></div>
+      <div class="stat"><div class="k">Within one level</div><div class="v">${n ? Math.round(within1 / n * 100) : 0}%</div></div>
+      <div class="stat"><div class="k">Model too high</div><div class="v">${over}</div></div>
+      <div class="stat"><div class="k">Model too low</div><div class="v">${under}</div></div>
+      <div class="stat"><div class="k">Videos with a verdict</div><div class="v">${vids.length}</div></div>
+    </div>
+    <div class="panel"><h3>Frames: model (rows) vs you (columns)</h3>${n ? `<table class="cm"><tr><th></th>${[0, 1, 2, 3, 4, 5].map(l => `<th>you S${l}</th>`).join('')}</tr>
+      ${[0, 1, 2, 3, 4, 5].map(m => `<tr><th>model S${m}</th>${[0, 1, 2, 3, 4, 5].map(y => { const c = cell(m, y); return `<td class="${m === y ? 'diag' : c ? (m > y ? 'over' : 'under') : ''}">${c || ''}</td>`; }).join('')}</tr>`).join('')}</table>` : '<div class="empty">Label some frames first.</div>'}</div>
+    <div class="panel"><h3>Rules marked wrong</h3>${Object.keys(perRule).length ? `<table class="cm"><tr><th>Rule</th><th>Fired on labelled frames</th><th>Marked wrong</th><th>Precision</th></tr>
+      ${Object.entries(perRule).sort((a, b) => b[1].wrong - a[1].wrong || b[1].fired - a[1].fired).map(([r, s]) => `<tr><td style="text-align:left">${esc(r)}</td><td>${s.fired}</td><td>${s.wrong}</td><td>${Math.round((1 - s.wrong / s.fired) * 100)}%</td></tr>`).join('')}</table>` : '<div class="empty">Click a rule chip on a frame to mark it wrong.</div>'}</div>
+    <div class="panel"><h3>Refusals vs your labels</h3><div class="sub" style="margin-bottom:8px">Does a refused question mean "yes"? For each question OpenAI refused, the levels you gave those frames.</div>
+      ${Object.keys(perRefusal).length ? `<table class="cm"><tr><th style="text-align:left">Refused question</th><th>Frames</th><th>Labelled</th>${[0, 1, 2, 3, 4, 5].map(l => `<th>you S${l}</th>`).join('')}<th>you ≥ S4</th></tr>
+      ${Object.entries(perRefusal).sort((a, b) => b[1].refused - a[1].refused).map(([q, s]) => `<tr><td style="text-align:left">${esc(q)}</td><td>${s.refused}</td><td>${s.labelled.length}</td>${[0, 1, 2, 3, 4, 5].map(l => `<td>${s.labelled.filter(x => x === l).length || ''}</td>`).join('')}<td>${s.labelled.length ? Math.round(s.labelled.filter(x => x >= 4).length / s.labelled.length * 100) + '%' : '–'}</td></tr>`).join('')}</table>` : '<div class="empty">No refusals in the reviewed videos.</div>'}</div>
+    <div class="panel"><h3>Videos</h3><table class="cm"><tr><th style="text-align:left">Video</th><th>Model peak</th><th>Model sustained</th><th>You</th></tr>
+      ${o.videos.map(v => `<tr><td style="text-align:left">${esc(v.titleEn || v.name)}</td><td>${chip(v.rating)}</td><td>${chip(v.sustained)}</td><td>${o.labels.videos[v.id]?.level !== undefined ? chip(o.labels.videos[v.id].level) : '–'}</td></tr>`).join('')}</table></div>`;
+}
+
+function openLightbox(i) {
+  const f = state.video.frames[i]; if (!f) return;
+  state.focus = i;
+  const lb = $('#lightbox');
+  lb.querySelector('img').src = `/frames/${encodeURIComponent(state.current)}/${f.file}`;
+  const all = Object.entries(f.answers || {}).map(([id, a]) => {
+    const v = a.type === 'noul' ? a.noul.toFixed(2) : a.type === 'score' ? `${a.score.toFixed(2)} ${JSON.stringify(a.probabilities)}` : `${a.choice} ${JSON.stringify(a.probabilities)}`;
+    return `<tr><td style="text-align:left">${esc(id)}</td><td style="text-align:left">${esc(v)}</td></tr>`;
+  }).join('');
+  lb.querySelector('.side').innerHTML = `<div class="row">${chip(f.level)}<b>${mmss(f.t)}</b>${f.before !== null && f.before !== f.level ? `<span class="sub">was S${f.before}</span>` : ''}</div>
+    <div style="margin:8px 0">${f.fired.map(r => `<span class="rule" style="cursor:default">${esc(r)}</span>`).join('')}${f.refused.map(q => `<span class="rule refused">refused: ${esc(q)}</span>`).join('')}</div>
+    <table class="cm" style="width:100%">${all}</table>`;
+  lb.classList.add('on');
+}
+
+async function selectVideo(id) {
+  state.current = id; state.focus = -1;
+  state.video = await api(`/api/video/${encodeURIComponent(id)}`);
+  renderList(); renderVideo(); $('main').scrollTop = 0;
+}
+document.addEventListener('click', async e => {
+  const t = e.target.closest('[data-id],[data-tab],[data-filter],[data-level],[data-rule],[data-zoom],[data-jump],.close');
+  if (!t) return;
+  if (t.classList.contains('close')) { $('#lightbox').classList.remove('on'); return; }
+  if (t.dataset.tab) { state.tab = t.dataset.tab; document.querySelectorAll('.tab').forEach(b => b.classList.toggle('on', b === t)); return state.tab === 'calibration' ? renderCalibration() : state.current ? renderVideo() : null; }
+  if (t.dataset.id) { state.tab = 'videos'; document.querySelectorAll('.tab').forEach(b => b.classList.toggle('on', b.dataset.tab === 'videos')); return selectVideo(t.dataset.id); }
+  if (t.dataset.filter) { state.filter = t.dataset.filter; return renderVideo(); }
+  if (t.dataset.zoom) return openLightbox(Number(t.dataset.zoom));
+  if (t.dataset.jump) {
+    const [scope, i] = t.dataset.jump.split(':');
+    if (scope === 'frames') { state.filter = 'all'; state.rule = ''; state.focus = Number(i); renderVideo(); document.getElementById(`frame-${i}`)?.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+    else document.getElementById(`window-${i}`)?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    return;
+  }
+  if (t.dataset.rule) {
+    const card = t.closest('.card'), f = state.video.frames[Number(card.dataset.i)], key = frameKey(state.current, f.t);
+    const label = { ...(state.overview.labels.frames[key] || {}) }; const wrong = new Set(label.wrongRules || []);
+    wrong.has(t.dataset.rule) ? wrong.delete(t.dataset.rule) : wrong.add(t.dataset.rule);
+    label.wrongRules = [...wrong]; t.classList.toggle('wrong');
+    return saveLabel('frames', key, label);
+  }
+  if (t.dataset.level !== undefined) {
+    const pick = t.parentElement, level = Number(t.dataset.level);
+    if (pick.dataset.video) { const cur = state.overview.labels.videos[state.current] || {}; await saveLabel('videos', state.current, { ...cur, level: cur.level === level ? undefined : level }); renderList(); return renderVideo(); }
+    if (pick.dataset.window !== undefined) { const w = state.video.windows[Number(pick.dataset.window)], key = `${state.current}@${w.start}`, cur = state.overview.labels.windows[key] || {}; await saveLabel('windows', key, { ...cur, level: cur.level === level ? undefined : level }); return renderVideo(); }
+    if (pick.dataset.frame !== undefined) return labelFrame(Number(pick.dataset.frame), level, true);
+  }
+});
+async function labelFrame(i, level, toggle) {
+  const f = state.video.frames[i], key = frameKey(state.current, f.t), cur = state.overview.labels.frames[key] || {};
+  await saveLabel('frames', key, { ...cur, level: toggle && cur.level === level ? undefined : level, model: f.level });
+  const y = $('main').scrollTop; renderList(); renderVideo(); $('main').scrollTop = y;
+}
+document.addEventListener('change', async e => {
+  if (e.target.id === 'ruleFilter') { state.rule = e.target.value; return renderVideo(); }
+  if (e.target.dataset.note !== undefined) { const f = state.video.frames[Number(e.target.dataset.note)], key = frameKey(state.current, f.t); return saveLabel('frames', key, { ...(state.overview.labels.frames[key] || {}), note: e.target.value }); }
+  if (e.target.dataset.vnote) return saveLabel('videos', state.current, { ...(state.overview.labels.videos[state.current] || {}), note: e.target.value });
+});
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || !state.video || state.tab !== 'videos') return;
+  if (e.key === 'Escape') return $('#lightbox').classList.remove('on');
+  const cards = [...document.querySelectorAll('.card')].map(c => Number(c.dataset.i));
+  if (!cards.length) return;
+  let pos = cards.indexOf(state.focus);
+  if (e.key === 'j' || e.key === 'k') {
+    pos = e.key === 'j' ? Math.min(cards.length - 1, pos + 1) : Math.max(0, pos - 1);
+    state.focus = cards[pos];
+    document.querySelectorAll('.card').forEach(c => c.classList.toggle('focus', Number(c.dataset.i) === state.focus));
+    document.getElementById(`frame-${state.focus}`)?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    if ($('#lightbox').classList.contains('on')) openLightbox(state.focus);
+    return;
+  }
+  if (state.focus < 0) return;
+  if (/^[0-5]$/.test(e.key)) return labelFrame(state.focus, Number(e.key), false);
+  if (e.key === 'a') return labelFrame(state.focus, state.video.frames[state.focus].level, false);
+  if (e.key === 'Enter') return openLightbox(state.focus);
+});
+(async () => {
+  state.overview = await api('/api/overview');
+  renderProgress(); renderList();
+  if (state.overview.videos.length) selectVideo(state.overview.videos[0].id);
+  else $('#main').innerHTML = '<div class="empty">No classified videos yet. Run classify first.</div>';
+})().catch(e => { $('#main').innerHTML = `<div class="empty">Failed to load: ${esc(e.message)}</div>`; });
+</script>
+</body>
+</html>

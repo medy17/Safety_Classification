@@ -1,0 +1,16 @@
+{
+  "name": "safety-classification",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Experimental: SFW–NSFW classification of video, image and text with OpenRouter Decisions on a rule-based S0–S5 scale",
+  "engines": {
+    "node": ">=22.9"
+  },
+  "scripts": {
+    "cli": "node --env-file-if-exists=.env.local src/cli.mjs",
+    "test": "node --test",
+    "compare": "node --env-file-if-exists=.env.local scripts/compare-sampling.mjs",
+    "review": "node src/cli.mjs review"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "mediaDir": "./media",
+  "stateDir": "./state",
+  "ffmpeg": "ffmpeg",
+  "ffprobe": "ffprobe",
+  "model": "openai/gpt-6-luna-decisions",
+  "frameIntervalSeconds": 60,
+  "maxSceneFrames": 20,
+  "sceneThreshold": 0.3,
+  "sceneMinGapSeconds": 15,
+  "frameWidth": 768,
+  "windowSeconds": 300,
+  "videoConcurrency": 2,
+  "apiConcurrency": 8,
+  "mediaConcurrency": 2,
+  "maxAttempts": 3,
+  "maxRunCostUsd": 5,
+  "inputUsdPerMillion": 0.1,
+  "appName": "Safety_Classification",
+  "appUrl": ""
+}
